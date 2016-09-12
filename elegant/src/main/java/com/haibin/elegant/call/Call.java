@@ -15,6 +15,8 @@
  */
 package com.haibin.elegant.call;
 
+import com.haibin.httpnet.builder.Headers;
+
 /**
  * 请求接口
  * @param <T>
@@ -23,4 +25,6 @@ public interface Call<T> {
     void execute(CallBack<T> callBack);
 
     void cancel();
+
+    Call<T> withHeaders(Headers.Builder headers);
 }

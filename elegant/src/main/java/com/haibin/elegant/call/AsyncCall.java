@@ -40,7 +40,8 @@ public class AsyncCall<T> implements Call<T> {
         this.mReturnType = (ParameterizedType) mReturnType;
     }
 
-    public AsyncCall withHeaders(Headers.Builder headers) {
+    @Override
+    public Call<T> withHeaders(Headers.Builder headers) {
         mBuilder.headers(headers);
         return this;
     }
