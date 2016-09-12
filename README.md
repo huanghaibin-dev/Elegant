@@ -1,5 +1,7 @@
-#Elegant
+#Elegant项目结构如下
 ![输入图片说明](http://git.oschina.net/uploads/images/2016/0912/100446_970746ab_494015.png "在这里输入图片标题")
+
+Elegant采用Retrofit动态代理+构建的思想，本身并不做网络请求，网络部分基于[HttpNet](http://git.oschina.net/huanghaibin_dev/HttpNet)实现，本着简介清晰的思想，保持了和Retrofit相似的API
 
 ##gradle
 ```
