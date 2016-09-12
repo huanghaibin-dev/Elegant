@@ -9,7 +9,7 @@ compile 'com.haibin:elegant:1.0.1'
 ```
 
 ##using
-```
+```java
 public interface LoginService {
 
     @POST("http://.../api/users/login")
