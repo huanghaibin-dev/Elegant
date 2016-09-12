@@ -46,18 +46,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-//        elegant.from(LoginService.class).login("1@qq.com", "1", 2, 2).execute(new CallBack<BaseModel<User>>() {
-//            @Override
-//            public void onResponse(Response<BaseModel<User>> response) {
-//                if(response != null){
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//
-//            }
-//        });
+        elegant.from(LoginService.class).login("1@qq.com", "1", 2, 2).execute(new CallBack<BaseModel<User>>() {
+            @Override
+            public void onResponse(Response<BaseModel<User>> response) {
+                if(response != null){
+
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
     }
 }
