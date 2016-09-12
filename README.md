@@ -5,13 +5,13 @@ Elegant采用Retrofit动态代理+构建的思想，本身并不做网络请求�
 
 ##gradle
 ```
-compile 'com.haibin:elegant:1.0.1'
+compile 'com.haibin:elegant:1.0.2'
 ```
 
 ##using
 ```java
 public interface LoginService {
-
+    @Headers({"Cookie:cid=adcdefg;"})
     @POST("http://.../api/users/login")
     Call<BaseModel<User>> login(@Form("email") String email,
                                 @Form("pwd") String pwd,
@@ -22,6 +22,8 @@ public interface LoginService {
 LoginService service = elegant.from(LoginService.class);
 
 Call<BaseModel<User>> call = service.login("xxx@qq.com", "123456", 2, 2);
+
+call.withHeaders(Headers...);
 
 call.execute(new CallBack<BaseModel<User>>() {
             @Override
