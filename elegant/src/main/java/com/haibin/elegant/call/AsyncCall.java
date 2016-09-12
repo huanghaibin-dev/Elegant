@@ -18,6 +18,7 @@ package com.haibin.elegant.call;
 
 import com.google.gson.Gson;
 import com.haibin.elegant.Elegant;
+import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
 
 import java.lang.reflect.ParameterizedType;
@@ -25,26 +26,33 @@ import java.lang.reflect.Type;
 
 /**
  * 真正的请求
+ *
  * @param <T>
  */
 public class AsyncCall<T> implements Call<T> {
     private Elegant mElegant;
-    private Request mRequest;
+    private Request.Builder mBuilder;
     private ParameterizedType mReturnType;
 
-    public AsyncCall(Elegant elegant, Request request, Type mReturnType) {
+    public AsyncCall(Elegant elegant, Request.Builder builder, Type mReturnType) {
         this.mElegant = elegant;
-        this.mRequest = request;
+        this.mBuilder = builder;
         this.mReturnType = (ParameterizedType) mReturnType;
+    }
+
+    public AsyncCall withHeaders(Headers.Builder headers) {
+        mBuilder.headers(headers);
+        return this;
     }
 
     /**
      * 封装了HttpNet，在这里执行请求，并将返回json解析，切换到UI线程
+     *
      * @param callBack
      */
     @Override
     public void execute(final CallBack<T> callBack) {
-        mElegant.getClient().newCall(mRequest).execute(new com.haibin.httpnet.core.call.CallBack() {
+        mElegant.getClient().newCall(mBuilder.build()).execute(new com.haibin.httpnet.core.call.CallBack() {
             @Override
             public void onResponse(com.haibin.httpnet.core.Response response) {
                 final com.haibin.elegant.Response res = new com.haibin.elegant.Response();

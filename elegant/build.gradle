@@ -30,7 +30,7 @@ android {
         from('build/intermediates/bundles/release/')
         into('build/libs/')
         include('classes.jar')
-        rename ('classes.jar', 'httpnet.jar')
+        rename ('classes.jar', 'elegant.jar')
     }
 
     makeJar.dependsOn(build)

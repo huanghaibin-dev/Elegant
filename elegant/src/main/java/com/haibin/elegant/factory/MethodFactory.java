@@ -15,11 +15,14 @@
  */
 package com.haibin.elegant.factory;
 
+import android.text.TextUtils;
+
 import com.haibin.elegant.Elegant;
 import com.haibin.elegant.net.Encode;
 import com.haibin.elegant.net.File;
 import com.haibin.elegant.net.Form;
 import com.haibin.elegant.net.GET;
+import com.haibin.elegant.net.Headers;
 import com.haibin.elegant.net.Json;
 import com.haibin.elegant.net.POST;
 import com.haibin.httpnet.builder.Request;
@@ -48,7 +51,7 @@ public class MethodFactory {
 
     public Object invoke(Object... args) {
         parseMethodParamsAnnotation(mMethod.getParameterAnnotations(), args);
-        return new RequestFactory(mReturnType, mBuilder.params(mParams).build()).convert(mElegant);
+        return new RequestFactory(mReturnType, mBuilder.params(mParams)).convert(mElegant);
     }
 
     public MethodFactory from(Method method) {
@@ -65,6 +68,7 @@ public class MethodFactory {
 
     /**
      * 获取并解析方法注解
+     *
      * @param annotations 方法注解
      */
     private void parseMethodAnnotation(Annotation[] annotations) {
@@ -78,6 +82,16 @@ public class MethodFactory {
                     mBuilder.url(((GET) annotation).value());
                 } else if (annotation instanceof Encode) {
                     mBuilder.encode(((Encode) annotation).value());
+                } else if (annotation instanceof Headers) {
+                    String[] headers = ((Headers) annotation).value();
+                    com.haibin.httpnet.builder.Headers.Builder builder = new com.haibin.httpnet.builder.Headers.Builder();
+                    for (String header : headers) {
+                        if (!TextUtils.isEmpty(header) && header.contains(":")) {
+                            String[] values = header.split(":");
+                            builder.addHeader(values[0], values[1]);
+                        }
+                    }
+                    mBuilder.headers(builder);
                 }
             }
         }
@@ -85,8 +99,9 @@ public class MethodFactory {
 
     /**
      * 获取并解析方法参数的注解
+     *
      * @param annotations 参数注解
-     * @param args 实际参数
+     * @param args        实际参数
      */
     private void parseMethodParamsAnnotation(Annotation[][] annotations, Object[] args) {
         if (annotations != null) {

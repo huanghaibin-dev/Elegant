@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haibin.elegant.call.Call;
 import com.haibin.elegant.call.CallBack;
@@ -30,10 +31,27 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View view) {
         start = System.currentTimeMillis();
 
+        elegant.from(LoginService.class).postAvatar("/storage/emulated/0/DCIM/Camera/1534724851.jpeg").execute(new CallBack<String>() {
+            @Override
+            public void onResponse(Response<String> response) {
+                if (response != null) {
+                    Toast.makeText(MainActivity.this, "上传成功", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (e != null) {
+
+                }
+            }
+        });
 //        elegant.from(LoginService.class).login("1@qq.com", "1", 2, 2).execute(new CallBack<BaseModel<User>>() {
 //            @Override
 //            public void onResponse(Response<BaseModel<User>> response) {
+//                if(response != null){
 //
+//                }
 //            }
 //
 //            @Override
@@ -41,39 +59,5 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
-        LoginService service = elegant.from(LoginService.class);
-
-        Call<BaseModel<User>> call = service.login("1@qq.com", "1", 2, 2);
-
-        call.execute(new CallBack<BaseModel<User>>() {
-            @Override
-            public void onResponse(Response<BaseModel<User>> response) {
-                end = System.currentTimeMillis();
-                textView.setText(response.getBodyString() +
-                        "\n" + response.getBody() +
-                        "\n" + response.getBody().getResult() +
-                        "\n" + response.getBody().getMessage() +
-                        "\n 共耗时：  " + (end - start) + "  毫秒");
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        });
-
-        LoginService baiduService = elegant.from(LoginService.class);
-        Call<String> baidu = service.getBaiDu();
-        baidu.execute(new CallBack<String>() {
-            @Override
-            public void onResponse(Response<String> response) {
-                textView.setText(response.getBodyString());
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        });
     }
 }

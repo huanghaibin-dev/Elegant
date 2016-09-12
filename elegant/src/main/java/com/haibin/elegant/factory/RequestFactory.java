@@ -28,11 +28,11 @@ import java.lang.reflect.Type;
  */
 public class RequestFactory<T> {
     private Type mReturnType;
-    private Request mRequest;
+    private Request.Builder mBuilder;
 
-    public RequestFactory(Type returnType, Request request) {
+    public RequestFactory(Type returnType, Request.Builder builder) {
         this.mReturnType = returnType;
-        this.mRequest = request;
+        this.mBuilder = builder;
     }
 
     /**
@@ -41,6 +41,6 @@ public class RequestFactory<T> {
      * @return 返回对象
      */
     public Call<T> convert(Elegant elegant) {
-        return new AsyncCall<>(elegant, mRequest, mReturnType);
+        return new AsyncCall<>(elegant, mBuilder, mReturnType);
     }
 }
