@@ -115,7 +115,7 @@ public class MethodFactory {
                     File file = (File) annotation;
                     mParams.putFile(file.value(), args[i].toString());
                 } else if (annotation instanceof Json) {
-                    mBuilder.content(new JsonContent(((Json) annotation).value()));
+                    mBuilder.content(new JsonContent(args[i].toString()));
                 }
             }
         }

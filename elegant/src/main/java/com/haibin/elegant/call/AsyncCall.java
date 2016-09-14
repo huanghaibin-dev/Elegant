@@ -23,6 +23,8 @@ import com.haibin.httpnet.builder.Request;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 真正的请求
@@ -33,7 +35,7 @@ public class AsyncCall<T> implements Call<T> {
     private Elegant mElegant;
     private Request.Builder mBuilder;
     private ParameterizedType mReturnType;
-
+    private Headers.Builder mHeaders;
     public AsyncCall(Elegant elegant, Request.Builder builder, Type mReturnType) {
         this.mElegant = elegant;
         this.mBuilder = builder;
@@ -42,6 +44,7 @@ public class AsyncCall<T> implements Call<T> {
 
     @Override
     public Call<T> withHeaders(Headers.Builder headers) {
+        this.mHeaders = headers;
         mBuilder.headers(headers);
         return this;
     }
@@ -53,6 +56,11 @@ public class AsyncCall<T> implements Call<T> {
      */
     @Override
     public void execute(final CallBack<T> callBack) {
+        Request request = mBuilder.build();
+        if(request.headers() != null){
+            Map<String, List<String>> headers = request.headers().getHeaders();
+
+        }
         mElegant.getClient().newCall(mBuilder.build()).execute(new com.haibin.httpnet.core.call.CallBack() {
             @Override
             public void onResponse(com.haibin.httpnet.core.Response response) {
