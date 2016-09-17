@@ -17,6 +17,14 @@ public interface LoginService {
                                 @Form("pwd") String pwd,
                                 @Form("versionNum") int versionNum,
                                 @Form("dataFrom") int dataFrom);
+                                
+   @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @Headers("Cookie:xxx=hbbb;")
+    Call<String> postAvatar(@File("portrait") String file);
+
+    @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @Headers("Cookie:xxx=hbbb;")
+    Call<String> postJson(@Json String file);
 }
 
 LoginService service = elegant.from(LoginService.class)
