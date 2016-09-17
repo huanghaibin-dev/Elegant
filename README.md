@@ -19,23 +19,20 @@ public interface LoginService {
                                 @Form("dataFrom") int dataFrom);
 }
 
-LoginService service = elegant.from(LoginService.class);
-
-Call<BaseModel<User>> call = service.login("xxx@qq.com", "123456", 2, 2);
-
-call.withHeaders(Headers...);
-
-call.execute(new CallBack<BaseModel<User>>() {
-            @Override
-            public void onResponse(Response<BaseModel<User>> response) {
+LoginService service = elegant.from(LoginService.class)
+                              .login("xxx@qq.com", "123456", 2, 2);
+                              .withHeaders(Headers...)
+                              .execute(new CallBack<BaseModel<User>>() {
+                                      @Override
+                                      public void onResponse(Response<BaseModel<User>> response) {
                 
-            }
+                                      }
 
-            @Override
-            public void onFailure(Exception e) {
+                                      @Override
+                                      public void onFailure(Exception e) {
 
-            }
-        });
+                                      }
+                              });
 ```
 
 
