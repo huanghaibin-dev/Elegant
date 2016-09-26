@@ -27,6 +27,7 @@ import com.haibin.elegant.net.Json;
 import com.haibin.elegant.net.PATCH;
 import com.haibin.elegant.net.POST;
 import com.haibin.elegant.net.PUT;
+import com.haibin.elegant.net.Proxy;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.io.JsonContent;
@@ -99,6 +100,9 @@ public class MethodFactory {
                     mBuilder.url(((PATCH) annotation).value());
                 } else if (annotation instanceof Encode) {
                     mBuilder.encode(((Encode) annotation).value());
+                } else if (annotation instanceof Proxy) {
+                    Proxy proxy = (Proxy) annotation;
+                    mBuilder.proxy(proxy.host(), proxy.port());
                 } else if (annotation instanceof Headers) {
                     String[] headers = ((Headers) annotation).value();
                     mHeaders = new com.haibin.httpnet.builder.Headers.Builder();

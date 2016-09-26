@@ -7,6 +7,7 @@ import com.haibin.elegant.net.GET;
 import com.haibin.elegant.net.Headers;
 import com.haibin.elegant.net.Json;
 import com.haibin.elegant.net.POST;
+import com.haibin.elegant.net.Proxy;
 import com.haibin.elegantproject.model.BaseModel;
 import com.haibin.elegantproject.model.PageBean;
 import com.haibin.elegantproject.model.ResultBean;
@@ -16,6 +17,7 @@ import com.haibin.elegantproject.model.User;
 
 public interface Service {
 
+    @Proxy(host = "192.168.1.1", port = 80)
     @POST("http://xxx/api/Users/PostLogin")
     Call<BaseModel<User>> login(@Form("email") String email,
                                 @Form("pwd") String pwd,
