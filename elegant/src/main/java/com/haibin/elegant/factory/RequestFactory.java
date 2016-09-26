@@ -15,32 +15,35 @@
  */
 package com.haibin.elegant.factory;
 
-import com.haibin.elegant.call.Call;
 import com.haibin.elegant.Elegant;
 import com.haibin.elegant.call.AsyncCall;
+import com.haibin.elegant.call.Call;
+import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
 
 import java.lang.reflect.Type;
 
 /**
  * 请求工厂，用于将代理转换为真正的请求
+ *
  * @param <T>
  */
 public class RequestFactory<T> {
     private Type mReturnType;
     private Request.Builder mBuilder;
 
-    public RequestFactory(Type returnType, Request.Builder builder) {
+    public RequestFactory(Request.Builder builder, Type returnType) {
         this.mReturnType = returnType;
         this.mBuilder = builder;
     }
 
     /**
      * 转换为真正的请求
+     *
      * @param elegant 代理
      * @return 返回对象
      */
-    public Call<T> convert(Elegant elegant) {
-        return new AsyncCall<>(elegant, mBuilder, mReturnType);
+    public Call<T> convert(Elegant elegant, Headers.Builder headers) {
+        return new AsyncCall<>(elegant, mBuilder, headers, mReturnType);
     }
 }

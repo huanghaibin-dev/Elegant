@@ -24,7 +24,9 @@ import com.haibin.elegant.net.Form;
 import com.haibin.elegant.net.GET;
 import com.haibin.elegant.net.Headers;
 import com.haibin.elegant.net.Json;
+import com.haibin.elegant.net.PATCH;
 import com.haibin.elegant.net.POST;
+import com.haibin.elegant.net.PUT;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.io.JsonContent;
@@ -44,14 +46,23 @@ public class MethodFactory {
     private RequestParams mParams;
     private Method mMethod;
     private Type mReturnType;
+    private com.haibin.httpnet.builder.Headers.Builder mHeaders;
 
     public MethodFactory(Elegant mElegant) {
         this.mElegant = mElegant;
     }
 
+    /**
+     * 动态代理转换为真正的执行
+     *
+     * @param args args
+     * @return Call<T>
+     */
     public Object invoke(Object... args) {
         parseMethodParamsAnnotation(mMethod.getParameterAnnotations(), args);
-        return new RequestFactory(mReturnType, mBuilder.params(mParams)).convert(mElegant);
+        if (mParams != null)
+            mBuilder.params(mParams);
+        return new RequestFactory(mBuilder, mReturnType).convert(mElegant, mHeaders);
     }
 
     public MethodFactory from(Method method) {
@@ -80,18 +91,23 @@ public class MethodFactory {
                 } else if (annotation instanceof GET) {
                     mBuilder.method("GET");
                     mBuilder.url(((GET) annotation).value());
+                } else if (annotation instanceof PUT) {
+                    mBuilder.method("PUT");
+                    mBuilder.url(((PUT) annotation).value());
+                } else if (annotation instanceof PATCH) {
+                    mBuilder.method("PATCH");
+                    mBuilder.url(((PATCH) annotation).value());
                 } else if (annotation instanceof Encode) {
                     mBuilder.encode(((Encode) annotation).value());
                 } else if (annotation instanceof Headers) {
                     String[] headers = ((Headers) annotation).value();
-                    com.haibin.httpnet.builder.Headers.Builder builder = new com.haibin.httpnet.builder.Headers.Builder();
+                    mHeaders = new com.haibin.httpnet.builder.Headers.Builder();
                     for (String header : headers) {
                         if (!TextUtils.isEmpty(header) && header.contains(":")) {
                             String[] values = header.split(":");
-                            builder.addHeader(values[0], values[1]);
+                            mHeaders.addHeader(values[0], values[1]);
                         }
                     }
-                    mBuilder.headers(builder);
                 }
             }
         }
@@ -116,6 +132,7 @@ public class MethodFactory {
                     mParams.putFile(file.value(), args[i].toString());
                 } else if (annotation instanceof Json) {
                     mBuilder.content(new JsonContent(args[i].toString()));
+                    mParams = null;
                 }
             }
         }

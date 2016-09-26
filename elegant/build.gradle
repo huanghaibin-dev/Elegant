@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 107
+        versionName "1.0.7"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -25,7 +25,7 @@ android {
         }
     }
 
-    task makeJar(type: Copy) {
+    task intoJar(type: Copy) {
         delete 'build/libs/elegant.jar'
         from('build/intermediates/bundles/release/')
         into('build/libs/')
@@ -33,7 +33,7 @@ android {
         rename ('classes.jar', 'elegant.jar')
     }
 
-    makeJar.dependsOn(build)
+    intoJar.dependsOn(build)
 }
 
 dependencies {
@@ -42,6 +42,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
-    compile 'com.haibin:httpnet:1.0.2'
+    compile 'com.haibin:httpnet:1.0.5'
 }
 apply from: '../script/gradle-jcenter-push.gradle'

@@ -16,15 +16,18 @@
 package com.haibin.elegant.call;
 
 
-import com.google.gson.Gson;
 import com.haibin.elegant.Elegant;
+import com.haibin.elegant.factory.GsonConvert;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
+import com.haibin.httpnet.core.Response;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 真正的请求
@@ -36,16 +39,26 @@ public class AsyncCall<T> implements Call<T> {
     private Request.Builder mBuilder;
     private ParameterizedType mReturnType;
     private Headers.Builder mHeaders;
-    public AsyncCall(Elegant elegant, Request.Builder builder, Type mReturnType) {
+
+    public AsyncCall(Elegant elegant, Request.Builder builder, Headers.Builder headers, Type mReturnType) {
         this.mElegant = elegant;
         this.mBuilder = builder;
+        this.mHeaders = headers;
         this.mReturnType = (ParameterizedType) mReturnType;
     }
 
     @Override
     public Call<T> withHeaders(Headers.Builder headers) {
-        this.mHeaders = headers;
-        mBuilder.headers(headers);
+        Map<String, List<String>> map = headers.build().getHeaders();
+        Set<String> set = map.keySet();
+        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            List<String> values = map.get(key);
+            for (String h : values) {
+                this.mHeaders.addHeader(key, h);
+            }
+        }
+        mBuilder.headers(mHeaders);
         return this;
     }
 
@@ -56,36 +69,10 @@ public class AsyncCall<T> implements Call<T> {
      */
     @Override
     public void execute(final CallBack<T> callBack) {
-        Request request = mBuilder.build();
-        if(request.headers() != null){
-            Map<String, List<String>> headers = request.headers().getHeaders();
-
-        }
         mElegant.getClient().newCall(mBuilder.build()).execute(new com.haibin.httpnet.core.call.CallBack() {
             @Override
-            public void onResponse(com.haibin.httpnet.core.Response response) {
-                final com.haibin.elegant.Response res = new com.haibin.elegant.Response();
-                res.setBodyString(response.getBody());
-                res.setCode(response.getCode());
-                res.setHeaders(response.getHeaders());
-                try {
-                    Type[] types = mReturnType.getActualTypeArguments();
-                    res.setBody(new Gson().fromJson(res.getBodyString(), types[0]));
-                    mElegant.getMainExecutor().runOnMainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callBack.onResponse(res);
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    mElegant.getMainExecutor().runOnMainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callBack.onResponse(res);
-                        }
-                    });
-                }
+            public void onResponse(Response response) {
+                new GsonConvert<T>().convert(response, mElegant, callBack, mReturnType);
             }
 
             @Override
