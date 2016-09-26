@@ -8,7 +8,7 @@ Elegant采用Retrofit动态代理+构建的思想，本身并不做网络请求�
 compile 'com.haibin:elegant:1.0.7'
 ```
 
-##using
+##创建API接口
 ```java
 public interface LoginService {
      
