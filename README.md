@@ -17,25 +17,30 @@ public interface LoginService {
                                 @Form("pwd") String pwd,
                                 @Form("versionNum") int versionNum,
                                 @Form("dataFrom") int dataFrom);
+                                
+   @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @Headers("Cookie:xxx=hbbb;")
+    Call<String> postAvatar(@File("portrait") String file);
+
+    @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @Headers("Cookie:xxx=hbbb;")
+    Call<String> postJson(@Json String file);
 }
 
-LoginService service = elegant.from(LoginService.class);
-
-Call<BaseModel<User>> call = service.login("xxx@qq.com", "123456", 2, 2);
-
-call.withHeaders(Headers...);
-
-call.execute(new CallBack<BaseModel<User>>() {
-            @Override
-            public void onResponse(Response<BaseModel<User>> response) {
+LoginService service = elegant.from(LoginService.class)
+                              .login("xxx@qq.com", "123456", 2, 2);
+                              .withHeaders(Headers...)
+                              .execute(new CallBack<BaseModel<User>>() {
+                                      @Override
+                                      public void onResponse(Response<BaseModel<User>> response) {
                 
-            }
+                                      }
 
-            @Override
-            public void onFailure(Exception e) {
+                                      @Override
+                                      public void onFailure(Exception e) {
 
-            }
-        });
+                                      }
+                              });
 ```
 
 
