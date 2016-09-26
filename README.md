@@ -11,22 +11,30 @@ compile 'com.haibin:elegant:1.0.7'
 ##using
 ```java
 public interface LoginService {
+     
+    //普通POST
     @Headers({"Cookie:cid=adcdefg;"})
     @POST("http://.../api/users/login")
     Call<BaseModel<User>> login(@Form("email") String email,
                                 @Form("pwd") String pwd,
                                 @Form("versionNum") int versionNum,
                                 @Form("dataFrom") int dataFrom);
-                                
-   @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+
+    // 上传文件                           
+    @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
     @Headers("Cookie:xxx=hbbb;")
     Call<String> postAvatar(@File("portrait") String file);
 
+    
+    //JSON POST
     @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
     @Headers("Cookie:xxx=hbbb;")
     Call<String> postJson(@Json String file);
 }
+```
 
+##执行请求
+```java
 LoginService service = elegant.from(LoginService.class)
                               .login("xxx@qq.com", "123456", 2, 2);
                               .withHeaders(Headers...)
