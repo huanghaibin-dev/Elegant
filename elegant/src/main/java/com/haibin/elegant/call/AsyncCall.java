@@ -49,6 +49,7 @@ public class AsyncCall<T> implements Call<T> {
 
     @Override
     public Call<T> withHeaders(Headers.Builder headers) {
+        if (mHeaders == null) mHeaders = new Headers.Builder();
         Map<String, List<String>> map = headers.build().getHeaders();
         Set<String> set = map.keySet();
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
@@ -69,6 +70,9 @@ public class AsyncCall<T> implements Call<T> {
      */
     @Override
     public void execute(final CallBack<T> callBack) {
+        if (mHeaders != null) {
+            this.mBuilder.headers(mHeaders);
+        }
         mElegant.getClient().newCall(mBuilder.build()).execute(new com.haibin.httpnet.core.call.CallBack() {
             @Override
             public void onResponse(Response response) {

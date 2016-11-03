@@ -1,12 +1,14 @@
 package com.haibin.elegantproject.api;
 
 import com.haibin.elegant.call.Call;
-import com.haibin.elegant.net.File;
 import com.haibin.elegant.net.Form;
 import com.haibin.elegant.net.GET;
 import com.haibin.elegant.net.Headers;
 import com.haibin.elegant.net.Json;
+import com.haibin.elegant.net.PATCH;
 import com.haibin.elegant.net.POST;
+import com.haibin.elegant.net.PUT;
+import com.haibin.elegant.net.Path;
 import com.haibin.elegant.net.Proxy;
 import com.haibin.elegantproject.model.BaseModel;
 import com.haibin.elegantproject.model.PageBean;
@@ -32,8 +34,9 @@ public interface Service {
     @Headers("Cookie:_ga=GA1.2.2128538109.1473746167; SERVERID=d0849c852e6ab8cf0cebe3fa386ea513|1474879648|1474879647")
     Call<String> postJson(@Json String json);
 
-    @GET("http://www.cnblogs.com/")
-    Call<String> getBlog();
+    @GET("{new_id}")
+    Call<String> getBlog(@Path("new_id") String id,
+                         @Form("aui") String aui);
 
     @GET("https://www.oschina.net/action/apiv2/tweets")
     Call<ResultBean<PageBean<Tweet>>> getTweet(@Form("type") int type,

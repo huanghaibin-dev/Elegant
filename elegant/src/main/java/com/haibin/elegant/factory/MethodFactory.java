@@ -18,6 +18,7 @@ package com.haibin.elegant.factory;
 import android.text.TextUtils;
 
 import com.haibin.elegant.Elegant;
+import com.haibin.elegant.net.DELETE;
 import com.haibin.elegant.net.Encode;
 import com.haibin.elegant.net.File;
 import com.haibin.elegant.net.Form;
@@ -27,6 +28,7 @@ import com.haibin.elegant.net.Json;
 import com.haibin.elegant.net.PATCH;
 import com.haibin.elegant.net.POST;
 import com.haibin.elegant.net.PUT;
+import com.haibin.elegant.net.Path;
 import com.haibin.elegant.net.Proxy;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
@@ -43,11 +45,12 @@ import java.lang.reflect.Type;
  */
 public class MethodFactory {
     private Elegant mElegant;
-    private Request.Builder mBuilder;
+    private Request.Builder mRequest;
     private RequestParams mParams;
     private Method mMethod;
     private Type mReturnType;
     private com.haibin.httpnet.builder.Headers.Builder mHeaders;
+    private String mHttpUrl;
 
     public MethodFactory(Elegant mElegant) {
         this.mElegant = mElegant;
@@ -61,18 +64,29 @@ public class MethodFactory {
      */
     public Object invoke(Object... args) {
         parseMethodParamsAnnotation(mMethod.getParameterAnnotations(), args);
-        if (mParams != null)
-            mBuilder.params(mParams);
-        return new RequestFactory(mBuilder, mReturnType).convert(mElegant, mHeaders);
+        if (mParams != null) {
+            mRequest.params(mParams);
+        }
+        return new RequestFactory(mRequest.url(convertUrl()), mReturnType).convert(mElegant, mHeaders);
     }
 
+    private String convertUrl() {
+        return TextUtils.isEmpty(mElegant.getBaseUrl()) ? mHttpUrl : mElegant.getBaseUrl() + mHttpUrl;
+    }
+
+    /**
+     * 解析方法
+     *
+     * @param method method
+     * @return MethodFactory
+     */
     public MethodFactory from(Method method) {
         this.mMethod = method;
         mReturnType = method.getGenericReturnType();
         if (mReturnType instanceof Class<?>)
             return null;
         if (mReturnType instanceof ParameterizedType) {
-            mBuilder = new Request.Builder();
+            mRequest = new Request.Builder();
             parseMethodAnnotation(method.getAnnotations());
         }
         return this;
@@ -87,22 +101,25 @@ public class MethodFactory {
         if (annotations != null) {
             for (Annotation annotation : annotations) {
                 if (annotation instanceof POST) {
-                    mBuilder.method("POST");
-                    mBuilder.url(((POST) annotation).value());
+                    mRequest.method("POST");
+                    mHttpUrl = ((POST) annotation).value();
                 } else if (annotation instanceof GET) {
-                    mBuilder.method("GET");
-                    mBuilder.url(((GET) annotation).value());
+                    mRequest.method("GET");
+                    mHttpUrl = ((GET) annotation).value();
                 } else if (annotation instanceof PUT) {
-                    mBuilder.method("PUT");
-                    mBuilder.url(((PUT) annotation).value());
+                    mRequest.method("PUT");
+                    mHttpUrl = ((PUT) annotation).value();
                 } else if (annotation instanceof PATCH) {
-                    mBuilder.method("PATCH");
-                    mBuilder.url(((PATCH) annotation).value());
+                    mRequest.method("PATCH");
+                    mHttpUrl = ((PATCH) annotation).value();
+                } else if (annotation instanceof DELETE) {
+                    mRequest.method("DELETE");
+                    mHttpUrl = ((DELETE) annotation).value();
                 } else if (annotation instanceof Encode) {
-                    mBuilder.encode(((Encode) annotation).value());
+                    mRequest.encode(((Encode) annotation).value());
                 } else if (annotation instanceof Proxy) {
                     Proxy proxy = (Proxy) annotation;
-                    mBuilder.proxy(proxy.host(), proxy.port());
+                    mRequest.proxy(proxy.host(), proxy.port());
                 } else if (annotation instanceof Headers) {
                     String[] headers = ((Headers) annotation).value();
                     mHeaders = new com.haibin.httpnet.builder.Headers.Builder();
@@ -124,7 +141,7 @@ public class MethodFactory {
      * @param args        实际参数
      */
     private void parseMethodParamsAnnotation(Annotation[][] annotations, Object[] args) {
-        if (annotations != null) {
+        if (annotations != null && annotations.length > 0) {
             mParams = new RequestParams();
             for (int i = 0; i < annotations.length; i++) {
                 Annotation annotation = annotations[i][0];
@@ -135,8 +152,12 @@ public class MethodFactory {
                     File file = (File) annotation;
                     mParams.putFile(file.value(), args[i].toString());
                 } else if (annotation instanceof Json) {
-                    mBuilder.content(new JsonContent(args[i].toString()));
+                    mRequest.content(new JsonContent(args[i].toString()));
                     mParams = null;
+                } else if (annotation instanceof Path) {
+                    Path path = (Path) annotation;
+                    String value = path.value();
+                    mHttpUrl = mHttpUrl.replace(String.format("{%s}", value), args[i].toString());
                 }
             }
         }

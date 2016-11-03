@@ -30,6 +30,7 @@ import java.lang.reflect.Proxy;
 public class Elegant {
     private HttpNetClient mClient;
     private MainThreadExecutor mMainExecutor;
+    private String mBaseUrl;
 
     public MainThreadExecutor getMainExecutor() {
         return mMainExecutor;
@@ -55,5 +56,13 @@ public class Elegant {
 
     public void setClient(HttpNetClient mClient) {
         this.mClient = mClient;
+    }
+
+    public void registerApi(String baseUrl) {
+        this.mBaseUrl = baseUrl;
+    }
+
+    public String getBaseUrl() {
+        return mBaseUrl;
     }
 }
