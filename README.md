@@ -5,7 +5,7 @@ Elegant采用Retrofit动态代理+构建的思想，本身并不做网络请求�
 
 ##gradle
 ```
-compile 'com.haibin:elegant:1.0.8'
+compile 'com.haibin:elegant:1.1.6'
 ```
 
 ##创建API接口
@@ -14,27 +14,38 @@ public interface LoginService {
      
     //普通POST
     @Headers({"Cookie:cid=adcdefg;"})
-    @POST("http://.../api/users/login")
+    @POST("api/users/login")
     Call<BaseModel<User>> login(@Form("email") String email,
                                 @Form("pwd") String pwd,
                                 @Form("versionNum") int versionNum,
                                 @Form("dataFrom") int dataFrom);
 
     // 上传文件                           
-    @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @POST("action/apiv2/user_edit_portrait")
     @Headers("Cookie:xxx=hbbb;")
     Call<String> postAvatar(@File("portrait") String file);
 
     
     //JSON POST
-    @POST("http://www.oschina.net/action/apiv2/user_edit_portrait")
+    @POST("action/apiv2/user_edit_portrait")
     @Headers("Cookie:xxx=hbbb;")
     Call<String> postJson(@Json String file);
+    
+    //PATCH
+    @PATCH("mobile/user/{uid}/online")
+    Call<ResultBean<String>> handUp(@Path("uid") long uid);
 }
 ```
 
 ##执行请求
 ```java
+public static final String API = "http://www.oschina.net/";
+public static Elegant elegant = new Elegant();
+
+static {
+    elegant.registerApi(API);
+}
+
 LoginService service = elegant.from(LoginService.class)
                               .login("xxx@qq.com", "123456", 2, 2);
                               .withHeaders(Headers...)
