@@ -30,6 +30,7 @@ import com.haibin.elegant.net.POST;
 import com.haibin.elegant.net.PUT;
 import com.haibin.elegant.net.Path;
 import com.haibin.elegant.net.Proxy;
+import com.haibin.elegant.net.Stream;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.io.JsonContent;
@@ -51,6 +52,7 @@ public class MethodFactory {
     private Type mReturnType;
     private com.haibin.httpnet.builder.Headers.Builder mHeaders;
     private String mHttpUrl;
+    private boolean isToStream;
 
     public MethodFactory(Elegant mElegant) {
         this.mElegant = mElegant;
@@ -67,7 +69,7 @@ public class MethodFactory {
         if (mParams != null) {
             mRequest.params(mParams);
         }
-        return new RequestFactory(mRequest.url(convertUrl()), mReturnType).convert(mElegant, mHeaders);
+        return new RequestFactory(mRequest.url(convertUrl()), mReturnType, isToStream).convert(mElegant, mHeaders);
     }
 
     private String convertUrl() {
@@ -83,12 +85,14 @@ public class MethodFactory {
     public MethodFactory from(Method method) {
         this.mMethod = method;
         mReturnType = method.getGenericReturnType();
-        if (mReturnType instanceof Class<?>)
-            return null;
-        if (mReturnType instanceof ParameterizedType) {
-            mRequest = new Request.Builder();
-            parseMethodAnnotation(method.getAnnotations());
-        }
+//        if (mReturnType instanceof Class<?>)
+//            return this;
+//        if (mReturnType instanceof ParameterizedType) {
+//            mRequest = new Request.Builder();
+//            parseMethodAnnotation(method.getAnnotations());
+//        }
+        mRequest = new Request.Builder();
+        parseMethodAnnotation(method.getAnnotations());
         return this;
     }
 
@@ -100,6 +104,9 @@ public class MethodFactory {
     private void parseMethodAnnotation(Annotation[] annotations) {
         if (annotations != null) {
             for (Annotation annotation : annotations) {
+                if (annotation instanceof Stream) {
+                    isToStream = true;
+                }
                 if (annotation instanceof POST) {
                     mRequest.method("POST");
                     mHttpUrl = ((POST) annotation).value();

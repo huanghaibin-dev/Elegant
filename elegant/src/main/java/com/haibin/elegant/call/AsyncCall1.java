@@ -22,43 +22,37 @@ import com.haibin.httpnet.core.call.InterceptListener;
 import java.io.IOException;
 
 /**
- * 请求接口
- *
- * @param <T>
+ * 请求的实现
+ * Created by haibin
+ * on 2017/1/18.
  */
-@SuppressWarnings("unused")
-public interface Call<T> {
-    /**
-     * 添加上传进度监听
-     * @param listener 监听器
-     * @return 请求
-     */
-    Call<T> intercept(InterceptListener listener);
+
+public class AsyncCall1<T> implements Call<T> {
+    @Override
+    public Call<T> intercept(InterceptListener listener) {
+        return null;
+    }
+
+    @Override
+    public Call<T> withHeaders(Headers.Builder headers) {
+        return null;
+    }
+
+    @Override
+    public void execute(Callback<T> callback) {
+
+    }
 
     /**
-     * 拦截添加Header
-     * @param headers 请求头
-     * @return 请求
+     * 同步执行，必须在子线程中执行
      */
-    Call<T> withHeaders(Headers.Builder headers);
+    @Override
+    public Response<T> execute() throws IOException {
+        return null;
+    }
 
-    /**
-     * 异步执行
-     *
-     * @param callback 回调
-     */
-    void execute(Callback<T> callback);
+    @Override
+    public void cancel() {
 
-    /**
-     * 同步执行，必须在线程中执行
-     *
-     * @return 请求结果
-     * @throws IOException 异常
-     */
-    Response<T> execute() throws IOException;
-
-    /**
-     * 取消网络请求
-     */
-    void cancel();
+    }
 }

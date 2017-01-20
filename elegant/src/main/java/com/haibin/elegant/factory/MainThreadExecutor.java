@@ -28,7 +28,7 @@ public class MainThreadExecutor {
         this.mHandler = new Handler(Looper.myLooper());
     }
 
-    public void runOnMainThread(Runnable runnable) {
+    void runOnMainThread(Runnable runnable) {
         mHandler.post(runnable);
     }
 }

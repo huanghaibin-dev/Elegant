@@ -5,11 +5,9 @@ import com.haibin.elegant.net.Form;
 import com.haibin.elegant.net.GET;
 import com.haibin.elegant.net.Headers;
 import com.haibin.elegant.net.Json;
-import com.haibin.elegant.net.PATCH;
 import com.haibin.elegant.net.POST;
-import com.haibin.elegant.net.PUT;
 import com.haibin.elegant.net.Path;
-import com.haibin.elegant.net.Proxy;
+import com.haibin.elegant.net.Stream;
 import com.haibin.elegantproject.model.BaseModel;
 import com.haibin.elegantproject.model.PageBean;
 import com.haibin.elegantproject.model.ResultBean;
@@ -19,8 +17,11 @@ import com.haibin.elegantproject.model.User;
 
 public interface Service {
 
-    @Proxy(host = "192.168.1.1", port = 80)
-    @POST("http://xxx/api/Users/PostLogin")
+    @Stream
+    @GET("http://f1.market.xiaomi.com/download/AppStore/0117653278abecee8762883a940e129e9d242ae7d/com.huanghaibin_dev.cnblogs.apk")
+    Call download();
+
+    @POST("http://yunapi.xiejianji.com/api//Users/PostLogin")
     Call<BaseModel<User>> login(@Form("email") String email,
                                 @Form("pwd") String pwd,
                                 @Form("versionNum") int versionNum,

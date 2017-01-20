@@ -15,18 +15,25 @@
  */
 package com.haibin.elegant;
 
+import com.haibin.httpnet.core.io.IO;
+
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 返回信息
+ *
  * @param <T>
  */
+@SuppressWarnings("unused")
 public class Response<T> {
-    private Map<String,List<String>> mHeaders;
+    private Map<String, List<String>> mHeaders;
+    private InputStream mInputStream;
     private int mCode;
     private String mBodyString;
     private T mBody;
+    private long mContentLength;
 
     public String getBodyString() {
         return mBodyString;
@@ -58,5 +65,25 @@ public class Response<T> {
 
     public void setHeaders(Map<String, List<String>> mHeaders) {
         this.mHeaders = mHeaders;
+    }
+
+    public InputStream toStream() {
+        return mInputStream;
+    }
+
+    public void setInputStream(InputStream mInputStream) {
+        this.mInputStream = mInputStream;
+    }
+
+    public long getContentLength() {
+        return mContentLength;
+    }
+
+    public void setContentLength(long mContentLength) {
+        this.mContentLength = mContentLength;
+    }
+
+    public void close() {
+        IO.close(mInputStream);
     }
 }

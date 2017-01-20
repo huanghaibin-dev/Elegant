@@ -28,13 +28,15 @@ import java.lang.reflect.Type;
  *
  * @param <T>
  */
-public class RequestFactory<T> {
+class RequestFactory<T> {
     private Type mReturnType;
     private Request.Builder mBuilder;
+    private boolean isToStream;
 
-    public RequestFactory(Request.Builder builder, Type returnType) {
+    RequestFactory(Request.Builder builder, Type returnType, boolean isToStream) {
         this.mReturnType = returnType;
         this.mBuilder = builder;
+        this.isToStream = isToStream;
     }
 
     /**
@@ -43,7 +45,7 @@ public class RequestFactory<T> {
      * @param elegant 代理
      * @return 返回对象
      */
-    public Call<T> convert(Elegant elegant, Headers.Builder headers) {
-        return new AsyncCall<>(elegant, mBuilder, headers, mReturnType);
+    Call<T> convert(Elegant elegant, Headers.Builder headers) {
+        return new AsyncCall<>(elegant, mBuilder, headers, mReturnType, isToStream);
     }
 }

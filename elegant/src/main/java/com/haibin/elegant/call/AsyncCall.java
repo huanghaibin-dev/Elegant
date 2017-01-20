@@ -17,14 +17,15 @@ package com.haibin.elegant.call;
 
 
 import com.haibin.elegant.Elegant;
+import com.haibin.elegant.Response;
 import com.haibin.elegant.factory.GsonConvert;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.core.Response;
+import com.haibin.httpnet.core.call.InterceptListener;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,12 +40,22 @@ public class AsyncCall<T> implements Call<T> {
     private Request.Builder mBuilder;
     private ParameterizedType mReturnType;
     private Headers.Builder mHeaders;
+    private InterceptListener mListener;
+    private com.haibin.httpnet.core.call.Call mCall;
+    private boolean isToStream;
 
-    public AsyncCall(Elegant elegant, Request.Builder builder, Headers.Builder headers, Type mReturnType) {
+    public AsyncCall(Elegant elegant,
+                     Request.Builder builder,
+                     Headers.Builder headers,
+                     Type mReturnType,
+                     boolean isToStream) {
         this.mElegant = elegant;
         this.mBuilder = builder;
         this.mHeaders = headers;
-        this.mReturnType = (ParameterizedType) mReturnType;
+        this.isToStream = isToStream;
+        if (!isToStream)
+            this.mReturnType = (ParameterizedType) mReturnType;
+
     }
 
     @Override
@@ -52,8 +63,7 @@ public class AsyncCall<T> implements Call<T> {
         if (mHeaders == null) mHeaders = new Headers.Builder();
         Map<String, List<String>> map = headers.build().getHeaders();
         Set<String> set = map.keySet();
-        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = iterator.next();
+        for (String key : set) {
             List<String> values = map.get(key);
             for (String h : values) {
                 this.mHeaders.addHeader(key, h);
@@ -66,33 +76,46 @@ public class AsyncCall<T> implements Call<T> {
     /**
      * 封装了HttpNet，在这里执行请求，并将返回json解析，切换到UI线程
      *
-     * @param callBack
+     * @param callback callback
      */
     @Override
-    public void execute(final CallBack<T> callBack) {
+    public void execute(final Callback<T> callback) {
         if (mHeaders != null) {
             this.mBuilder.headers(mHeaders);
         }
-        mElegant.getClient().newCall(mBuilder.build()).execute(new com.haibin.httpnet.core.call.CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                new GsonConvert<T>().convert(response, mElegant, callBack, mReturnType);
-            }
-
-            @Override
-            public void onFailure(final Exception e) {
-                mElegant.getMainExecutor().runOnMainThread(new Runnable() {
+        mCall = mElegant.getClient().newCall(mBuilder.build());
+        mCall.intercept(mListener)
+                .execute(new com.haibin.httpnet.core.call.Callback() {
                     @Override
-                    public void run() {
-                        callBack.onFailure(e);
+                    public void onResponse(com.haibin.httpnet.core.Response response) {
+                        new GsonConvert<T>(isToStream).convert(response, mElegant, callback, mReturnType);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        callback.onFailure(e);
                     }
                 });
-            }
-        });
+    }
+
+    @Override
+    public Call<T> intercept(InterceptListener listener) {
+        mListener = listener;
+        return this;
+    }
+
+    @Override
+    public Response<T> execute() throws IOException {
+        mCall = mElegant.getClient().newCall(mBuilder.build());
+        mCall.intercept(mListener);
+        return new GsonConvert<T>(isToStream)
+                .convert(mCall.execute(),
+                        mElegant, mReturnType);
     }
 
     @Override
     public void cancel() {
-
+        if (mCall != null)
+            mCall.cancel();
     }
 }

@@ -17,8 +17,21 @@ package com.haibin.elegant.call;
 
 import com.haibin.elegant.Response;
 
-public interface CallBack<T> {
+/**
+ * 动态代理的回调
+ */
+public interface Callback<T> {
+    /**
+     * 请求成功的回调
+     *
+     * @param response 响应数据
+     */
     void onResponse(Response<T> response);
 
+    /**
+     * 失败回调
+     *
+     * @param e 异常
+     */
     void onFailure(Exception e);
 }
