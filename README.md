@@ -5,7 +5,7 @@ Elegant采用Retrofit动态代理+构建的思想，本身并不做网络请求�
 
 ##gradle
 ```
-compile 'com.haibin:elegant:1.1.8'
+compile 'com.haibin:elegant:1.1.9'
 ```
 
 ##创建API接口
