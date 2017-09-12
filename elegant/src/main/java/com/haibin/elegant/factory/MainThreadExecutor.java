@@ -25,10 +25,10 @@ public class MainThreadExecutor {
     private Handler mHandler;
 
     public MainThreadExecutor() {
-        this.mHandler = new Handler(Looper.myLooper());
+        this.mHandler = new Handler(Looper.getMainLooper());
     }
 
-    void runOnMainThread(Runnable runnable) {
+    public void runOnMainThread(Runnable runnable) {
         mHandler.post(runnable);
     }
 }

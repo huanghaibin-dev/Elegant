@@ -42,4 +42,9 @@ public interface Service {
     @GET("https://www.oschina.net/action/apiv2/tweets")
     Call<ResultBean<PageBean<Tweet>>> getTweet(@Form("type") int type,
                                                @Form("pageToken") String token);
+
+    @POST("http://api.xiejianji.com/api/Users/PostLogin2_1")
+    Call<String> text(@Form("email") String email,
+                       @Form("pwd") String pwd,
+                       @Form("versionNum") String versionNum);
 }

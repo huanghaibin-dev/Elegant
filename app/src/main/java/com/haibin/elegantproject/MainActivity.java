@@ -15,7 +15,10 @@ import com.haibin.elegant.call.Callback;
 import com.haibin.elegantproject.api.Service;
 import com.haibin.elegantproject.model.BaseModel;
 import com.haibin.elegantproject.model.User;
+import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
+import com.haibin.httpnet.builder.Request;
+import com.haibin.httpnet.core.io.JsonContent;
 
 import java.io.File;
 import java.io.InputStream;
@@ -36,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private Elegant mElegant;
     private TextView mTextView;
     private ProgressBar mProgressBar;
-
+    private Request request;
+    private HttpNetClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
         mTextView = (TextView) findViewById(R.id.text1);
         mElegant = new Elegant();
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        request = new Request.Builder()
+                .url("http://api.mobileanjian.com/api/SetFeedBack")
+                .content(new JsonContent("{\"AndoridData\":\"6.0.1\",\"BaseBandVersion\":\"MPSS.DI.4.0-20ac506\",\"CoreVersion\":\"3.4.0-gf4b741d-00639-ge918701\",\"DPI\":\"480\",\"Data\":{\"rdata\":[{\"Image\":\"0\"}]},\"FeedBack\":\"gegh\",\"GUID\":\"90845DEE-7577-48cf-A154-72E65CDE5586\",\"IMEI\":\"865931020628376\",\"Model\":\"MI 4LTE\",\"Process\":\"四核，CPU型号：ARMv7 Processor rev 1 (v7l) \",\"QQ\":\"5586586658\",\"RAM\":\"2.80 GB\",\"Resolution\":\"1080*1920\",\"RooStatus\":\"1\",\"SerialNumber\":\"5eeecb99\",\"SystemVersion\":\"MIUI系统\",\"TelNumber\":\"0\"}"))
+                .method("POST")
+                .build();
+        client = new HttpNetClient();
     }
 
     public void onClick(View view) {
@@ -52,12 +62,49 @@ public class MainActivity extends AppCompatActivity {
                 //rxExecute();
                 //rxDownload();
                 //rxLogin();
+                login();
+//                for(int i=0;i<50;i++){
+//                    jsonPost();
+//                }
                 break;
             case R.id.btn_cancel:
                 if (mCallDownload != null)
                     mCallDownload.cancel();
                 break;
         }
+    }
+
+    private void login(){
+        new Elegant().from(Service.class)
+                .text("huanghaibin_dev@163.com","R25ibhlC8WbVMBOLClxYVw==\n","2.5")
+                .withHeaders(new Headers.Builder().addHeader("Cookie","12d4ed5917c9012ef9ca9974c57aa7fd;huanghaibin_dev@163.com"))
+                .execute(new Callback<String>() {
+                    @Override
+                    public void onResponse(Response<String> response) {
+                        mTextView.setText(response.getBodyString());
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        mTextView.setText(e.getMessage());
+                    }
+                });
+    }
+
+    private void jsonPost() {
+        client.newCall(request)
+                .execute(new com.haibin.httpnet.core.call.Callback() {
+                    @Override
+                    public void onResponse(com.haibin.httpnet.core.Response response) {
+                        Log.e("res", "" + response.getBody());
+                        jsonPost();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        jsonPost();
+                    }
+                });
     }
 
     /**

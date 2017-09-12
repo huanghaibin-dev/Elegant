@@ -92,8 +92,13 @@ public class AsyncCall<T> implements Call<T> {
                     }
 
                     @Override
-                    public void onFailure(Exception e) {
-                        callback.onFailure(e);
+                    public void onFailure(final Exception e) {
+                        mElegant.getMainExecutor().runOnMainThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onFailure(e);
+                            }
+                        });
                     }
                 });
     }
